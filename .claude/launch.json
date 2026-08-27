@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "simple-server",
+      "runtimeExecutable": "powershell",
+      "runtimeArgs": ["-Command", "$null = New-WebServiceListener -IPAddress 127.0.0.1 -Port 8080 -Path '.'; Get-WebServiceListener | Wait-Process"],
+      "port": 8080
+    }
+  ]
+}
