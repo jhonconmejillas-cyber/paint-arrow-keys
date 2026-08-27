@@ -8,6 +8,7 @@ const downloadBtn = document.getElementById('downloadBtn');
 
 canvas.width = Math.min(window.innerWidth - 40, 800);
 canvas.height = 500;
+canvas.tabIndex = 1;
 
 let isDrawing = false;
 let cursorX = canvas.width / 2;
@@ -21,11 +22,21 @@ ctx.fillRect(0, 0, canvas.width, canvas.height);
 
 const drawCursor = () => {
     ctx.save();
+    ctx.strokeStyle = '#667eea';
+    ctx.lineWidth = 2;
+    ctx.globalAlpha = 0.7;
+    ctx.beginPath();
+    ctx.arc(cursorX, cursorY, parseInt(sizeInput.value) / 2, 0, Math.PI * 2);
+    ctx.stroke();
+
     ctx.strokeStyle = '#999';
     ctx.lineWidth = 1;
-    ctx.globalAlpha = 0.5;
+    ctx.globalAlpha = 0.4;
     ctx.beginPath();
-    ctx.arc(cursorX, cursorY, parseInt(sizeInput.value), 0, Math.PI * 2);
+    ctx.moveTo(cursorX - 10, cursorY);
+    ctx.lineTo(cursorX + 10, cursorY);
+    ctx.moveTo(cursorX, cursorY - 10);
+    ctx.lineTo(cursorX, cursorY + 10);
     ctx.stroke();
     ctx.restore();
 };
@@ -35,14 +46,16 @@ const saveState = () => {
 };
 
 let undoStack = [saveState()];
+let drawingPixels = null;
 
 const redrawWithCursor = () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = 'white';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    ctx.putImageData(imageData, 0, 0);
+    if (drawingPixels) {
+        ctx.putImageData(drawingPixels, 0, 0);
+    }
 
     drawCursor();
 };
@@ -52,59 +65,56 @@ const moveCursor = (dx, dy) => {
     cursorY = Math.max(0, Math.min(canvas.height, cursorY + dy));
 };
 
-document.addEventListener('keydown', (e) => {
+canvas.addEventListener('keydown', (e) => {
     keys[e.key] = true;
 
-    let moved = false;
     const step = 5;
 
     if (e.key === 'ArrowUp') {
         moveCursor(0, -step);
-        moved = true;
         e.preventDefault();
-    }
-    if (e.key === 'ArrowDown') {
+    } else if (e.key === 'ArrowDown') {
         moveCursor(0, step);
-        moved = true;
         e.preventDefault();
-    }
-    if (e.key === 'ArrowLeft') {
+    } else if (e.key === 'ArrowLeft') {
         moveCursor(-step, 0);
-        moved = true;
         e.preventDefault();
-    }
-    if (e.key === 'ArrowRight') {
+    } else if (e.key === 'ArrowRight') {
         moveCursor(step, 0);
-        moved = true;
         e.preventDefault();
-    }
-
-    if (e.key === ' ') {
+    } else if (e.key === ' ') {
         e.preventDefault();
         isDrawing = !isDrawing;
     }
-
-    if (e.key === 'Control' || e.key === 'Meta') {
-        e.preventDefault();
-    }
 });
 
-document.addEventListener('keyup', (e) => {
+canvas.addEventListener('keyup', (e) => {
     keys[e.key] = false;
+});
+
+canvas.addEventListener('focus', () => {
+    canvas.style.boxShadow = '0 5px 15px rgba(102, 126, 234, 0.5)';
+});
+
+canvas.addEventListener('blur', () => {
+    canvas.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.1)';
 });
 
 canvas.addEventListener('mousedown', () => {
     isDrawing = true;
+    canvas.focus();
 });
 
 canvas.addEventListener('mouseup', () => {
     isDrawing = false;
+    drawingPixels = ctx.getImageData(0, 0, canvas.width, canvas.height);
 });
 
 canvas.addEventListener('mousemove', (e) => {
     const rect = canvas.getBoundingClientRect();
     cursorX = e.clientX - rect.left;
     cursorY = e.clientY - rect.top;
+    canvas.focus();
 });
 
 canvas.addEventListener('mouseleave', () => {
@@ -121,6 +131,7 @@ const draw = () => {
         ctx.beginPath();
         ctx.arc(cursorX, cursorY, parseInt(sizeInput.value) / 2, 0, Math.PI * 2);
         ctx.fill();
+        drawingPixels = ctx.getImageData(0, 0, canvas.width, canvas.height);
     }
 };
 
@@ -131,6 +142,10 @@ const animate = () => {
 };
 
 animate();
+
+window.addEventListener('load', () => {
+    canvas.focus();
+});
 
 clearBtn.addEventListener('click', () => {
     ctx.fillStyle = 'white';
