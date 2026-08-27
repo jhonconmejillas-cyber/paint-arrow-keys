@@ -1,8 +1,6 @@
 {
   "name": "paint-arrow-keys",
   "version": 2,
-  "public": true,
-  "buildCommand": "echo 'No build needed'",
   "routes": [
     {
       "src": "/(.*)",
