@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paint con Flechas</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Paint con Flechas del Teclado</h1>
+        <div class="info">
+            <p>Usa las <strong>flechas del teclado</strong> para mover el pincel</p>
+            <p>Click en el canvas para dibujar, arrastra para pintar</p>
+        </div>
+        <canvas id="canvas"></canvas>
+        <div class="controls">
+            <button id="clearBtn">Limpiar</button>
+            <button id="downloadBtn">Descargar</button>
+            <div class="color-picker">
+                <label for="colorInput">Color:</label>
+                <input type="color" id="colorInput" value="#000000">
+            </div>
+            <div class="size-picker">
+                <label for="sizeInput">Tamaño:</label>
+                <input type="range" id="sizeInput" min="1" max="50" value="5">
+                <span id="sizeValue">5</span>px
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
